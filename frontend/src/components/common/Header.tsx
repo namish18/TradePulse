@@ -9,30 +9,112 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
+  const linkStyle: React.CSSProperties = {
+    color: 'var(--color-gray-300)',
+    transition: 'color var(--transition-base)',
+    cursor: 'pointer',
+  };
+
   return (
-    <header className="bg-primary-dark border-b border-primary-light/20 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header
+      style={{
+        backgroundColor: 'var(--color-primary-dark)',
+        borderBottom: '1px solid rgba(2, 6, 111, 0.2)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
+      }}
+    >
+      <div style={{ maxWidth: '80rem', margin: '0 auto', paddingLeft: '1rem', paddingRight: '1rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: '4rem',
+          }}
+        >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <div className="w-8 h-8 rounded bg-gradient-to-br from-danger to-primary-light" />
-            <span className="text-white">Trading</span>
+          <Link
+            href="/"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: '700',
+              fontSize: '1.25rem',
+              textDecoration: 'none',
+              color: 'inherit',
+            }}
+          >
+            <div
+              style={{
+                width: '2rem',
+                height: '2rem',
+                borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, var(--color-danger) 0%, var(--color-primary-light) 100%)',
+              }}
+            />
+            <span style={{ color: 'var(--color-white)' }}>Trading</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav
+            style={{
+              display: 'none',
+              '@media (min-width: 768px)': { display: 'flex' },
+              alignItems: 'center',
+              gap: '2rem',
+            } as any}
+          >
             {user && (
               <>
-                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/dashboard"
+                  style={linkStyle}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-white)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-gray-300)';
+                  }}
+                >
                   Dashboard
                 </Link>
-                <Link href="/dashboard/market" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/dashboard/market"
+                  style={linkStyle}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-white)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-gray-300)';
+                  }}
+                >
                   Market
                 </Link>
-                <Link href="/dashboard/portfolio" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/dashboard/portfolio"
+                  style={linkStyle}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-white)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-gray-300)';
+                  }}
+                >
                   Portfolio
                 </Link>
-                <Link href="/dashboard/risk" className="text-gray-300 hover:text-white transition-colors">
+                <Link
+                  href="/dashboard/risk"
+                  style={linkStyle}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-white)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-gray-300)';
+                  }}
+                >
                   Risk
                 </Link>
               </>
@@ -40,25 +122,62 @@ export function Header() {
           </nav>
 
           {/* User Menu */}
-          <div className="hidden md:flex items-center gap-4">
+          <div
+            style={{
+              display: 'none',
+              '@media (min-width: 768px)': { display: 'flex' },
+              alignItems: 'center',
+              gap: '1rem',
+            } as any}
+          >
             {user ? (
               <>
-                <span className="text-gray-300">{user.email}</span>
+                <span style={{ color: 'var(--color-gray-300)' }}>{user.email}</span>
                 <Link href="/settings" title="Settings">
-                  <Settings className="w-5 h-5 text-gray-300 hover:text-white transition-colors" />
+                  <Settings
+                    style={{ width: '1.25rem', height: '1.25rem', color: 'var(--color-gray-300)', cursor: 'pointer', transition: 'color var(--transition-base)' }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as any).style.color = 'var(--color-white)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as any).style.color = 'var(--color-gray-300)';
+                    }}
+                  />
                 </Link>
                 <button
                   onClick={() => logout()}
                   title="Logout"
-                  className="text-gray-300 hover:text-white transition-colors"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--color-gray-300)',
+                    transition: 'color var(--transition-base)',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-white)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--color-gray-300)';
+                  }}
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut style={{ width: '1.25rem', height: '1.25rem' }} />
                 </button>
               </>
             ) : (
               <Link
                 href="/login"
-                className="px-4 py-2 bg-danger hover:bg-red-600 text-white rounded-lg transition-colors"
+                style={{
+                  paddingLeft: '1rem',
+                  paddingRight: '1rem',
+                  paddingTop: '0.5rem',
+                  paddingBottom: '0.5rem',
+                  backgroundColor: 'var(--color-danger)',
+                  color: 'var(--color-white)',
+                  borderRadius: 'var(--radius-lg)',
+                  transition: 'background-color var(--transition-base)',
+                  textDecoration: 'none',
+                }}
               >
                 Login
               </Link>
@@ -68,37 +187,67 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+            style={{
+              display: 'none',
+              '@media (max-width: 767px)': { display: 'block' },
+              padding: '0.5rem',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              borderRadius: 'var(--radius-lg)',
+              color: 'var(--color-white)',
+              transition: 'background-color var(--transition-base)',
+            } as any}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+            }}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X style={{ width: '1.5rem', height: '1.5rem' }} /> : <Menu style={{ width: '1.5rem', height: '1.5rem' }} />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-primary-light/20">
-            <div className="flex flex-col gap-4">
+          <nav
+            style={{
+              display: 'none',
+              '@media (max-width: 767px)': { display: 'block' },
+              paddingTop: '1rem',
+              paddingBottom: '1rem',
+              borderTop: '1px solid rgba(2, 6, 111, 0.2)',
+            } as any}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {user && (
                 <>
-                  <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/dashboard" style={{ ...linkStyle, textDecoration: 'none' }}>
                     Dashboard
                   </Link>
-                  <Link href="/dashboard/market" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/dashboard/market" style={{ ...linkStyle, textDecoration: 'none' }}>
                     Market
                   </Link>
-                  <Link href="/dashboard/portfolio" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/dashboard/portfolio" style={{ ...linkStyle, textDecoration: 'none' }}>
                     Portfolio
                   </Link>
-                  <Link href="/dashboard/risk" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/dashboard/risk" style={{ ...linkStyle, textDecoration: 'none' }}>
                     Risk
                   </Link>
-                  <hr className="border-primary-light/20" />
-                  <Link href="/settings" className="text-gray-300 hover:text-white transition-colors">
+                  <hr style={{ borderColor: 'rgba(2, 6, 111, 0.2)', borderTop: 'none', borderLeft: 'none', borderRight: 'none' }} />
+                  <Link href="/settings" style={{ ...linkStyle, textDecoration: 'none' }}>
                     Settings
                   </Link>
                   <button
                     onClick={() => logout()}
-                    className="text-left text-gray-300 hover:text-white transition-colors"
+                    style={{
+                      textAlign: 'left',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      ...linkStyle,
+                    }}
                   >
                     Logout
                   </button>
@@ -107,7 +256,19 @@ export function Header() {
               {!user && (
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-danger hover:bg-red-600 text-white rounded-lg transition-colors text-center"
+                  style={{
+                    paddingLeft: '1rem',
+                    paddingRight: '1rem',
+                    paddingTop: '0.5rem',
+                    paddingBottom: '0.5rem',
+                    backgroundColor: 'var(--color-danger)',
+                    color: 'var(--color-white)',
+                    borderRadius: 'var(--radius-lg)',
+                    transition: 'background-color var(--transition-base)',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'block',
+                  }}
                 >
                   Login
                 </Link>

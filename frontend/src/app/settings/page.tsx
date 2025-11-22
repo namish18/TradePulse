@@ -8,40 +8,59 @@ import { DashboardLayout } from '@/components/dashboard';
 function SettingsContent() {
   const { user } = useAuth();
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    paddingLeft: '1rem',
+    paddingRight: '1rem',
+    paddingTop: '0.5rem',
+    paddingBottom: '0.5rem',
+    backgroundColor: 'var(--color-primary-dark)',
+    border: '1px solid rgba(2, 6, 111, 0.2)',
+    borderRadius: 'var(--radius-lg)',
+    color: 'var(--color-white)',
+    fontSize: '1rem',
+    transition: 'border-color var(--transition-base)',
+    fontFamily: 'inherit',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: 'var(--color-gray-300)',
+    marginBottom: '0.5rem',
+  };
+
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         <div>
-          <h1 className="text-3xl font-bold text-white">Settings</h1>
-          <p className="text-gray-400 mt-2">Manage your account and preferences</p>
+          <h1 style={{ fontSize: '1.875rem', fontWeight: '700', color: 'var(--color-white)' }}>Settings</h1>
+          <p style={{ color: 'var(--color-gray-400)', marginTop: '0.5rem' }}>Manage your account and preferences</p>
         </div>
 
         {/* Profile Section */}
         <Card variant="glass">
           <CardHeader>
-            <h2 className="text-xl font-semibold text-white">Profile</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--color-white)' }}>Profile</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Email
-              </label>
+              <label style={labelStyle}>Email</label>
               <input
                 type="email"
                 value={user?.email || ''}
                 disabled
-                className="w-full px-4 py-2 bg-primary-dark border border-primary-light/20 rounded-lg text-gray-400 disabled:opacity-50"
+                style={{ ...inputStyle, opacity: 0.5 }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Name
-              </label>
+              <label style={labelStyle}>Name</label>
               <input
                 type="text"
                 value={user?.name || ''}
                 disabled
-                className="w-full px-4 py-2 bg-primary-dark border border-primary-light/20 rounded-lg text-gray-400 disabled:opacity-50"
+                style={{ ...inputStyle, opacity: 0.5 }}
               />
             </div>
           </CardContent>
@@ -50,20 +69,20 @@ function SettingsContent() {
         {/* Notification Preferences */}
         <Card variant="glass">
           <CardHeader>
-            <h2 className="text-xl font-semibold text-white">Notifications</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--color-white)' }}>Notifications</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4" />
-              <span className="text-white">Email notifications</span>
+          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input type="checkbox" defaultChecked style={{ width: '1rem', height: '1rem' }} />
+              <span style={{ color: 'var(--color-white)' }}>Email notifications</span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4" />
-              <span className="text-white">Push notifications</span>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input type="checkbox" defaultChecked style={{ width: '1rem', height: '1rem' }} />
+              <span style={{ color: 'var(--color-white)' }}>Push notifications</span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4" />
-              <span className="text-white">SMS alerts</span>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input type="checkbox" style={{ width: '1rem', height: '1rem' }} />
+              <span style={{ color: 'var(--color-white)' }}>SMS alerts</span>
             </label>
           </CardContent>
         </Card>
@@ -71,29 +90,37 @@ function SettingsContent() {
         {/* Risk Limits */}
         <Card variant="glass">
           <CardHeader>
-            <h2 className="text-xl font-semibold text-white">Risk Limits</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--color-white)' }}>Risk Limits</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Daily Loss Limit ($)
-              </label>
+              <label style={labelStyle}>Daily Loss Limit ($)</label>
               <input
                 type="number"
                 defaultValue="10000"
-                className="w-full px-4 py-2 bg-primary-dark border border-primary-light/20 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-danger"
+                style={inputStyle}
+                onFocus={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--color-danger)';
+                }}
+                onBlur={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(2, 6, 111, 0.2)';
+                }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Max Leverage
-              </label>
+              <label style={labelStyle}>Max Leverage</label>
               <input
                 type="number"
                 defaultValue="2"
                 min="1"
                 step="0.1"
-                className="w-full px-4 py-2 bg-primary-dark border border-primary-light/20 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-danger"
+                style={inputStyle}
+                onFocus={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--color-danger)';
+                }}
+                onBlur={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(2, 6, 111, 0.2)';
+                }}
               />
             </div>
           </CardContent>

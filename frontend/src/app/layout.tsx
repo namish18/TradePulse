@@ -3,6 +3,7 @@ import { ApolloWrapper } from '@/lib/apollo-provider';
 import { AuthProvider } from '@/components/auth';
 import { ErrorBoundary } from '@/components/common';
 import '@/styles/globals.css';
+import '@/styles/utilities.css';
 
 export const metadata: Metadata = {
   title: 'Trading Platform',

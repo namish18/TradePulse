@@ -11,15 +11,22 @@ interface TooltipProps {
 export function Tooltip({ content, children, position = 'top' }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
 
-  const positionStyles = {
-    top: 'bottom-full mb-2 -translate-x-1/2 left-1/2',
-    bottom: 'top-full mt-2 -translate-x-1/2 left-1/2',
-    left: 'right-full mr-2 top-1/2 -translate-y-1/2',
-    right: 'left-full ml-2 top-1/2 -translate-y-1/2',
+  const positionMap: Record<'top' | 'bottom' | 'left' | 'right', React.CSSProperties> = {
+    top: { bottom: '100%', marginBottom: '0.5rem', left: '50%', transform: 'translateX(-50%)' },
+    bottom: { top: '100%', marginTop: '0.5rem', left: '50%', transform: 'translateX(-50%)' },
+    left: { right: '100%', marginRight: '0.5rem', top: '50%', transform: 'translateY(-50%)' },
+    right: { left: '100%', marginLeft: '0.5rem', top: '50%', transform: 'translateY(-50%)' },
+  };
+
+  const arrowPositionMap: Record<'top' | 'bottom' | 'left' | 'right', React.CSSProperties> = {
+    top: { top: '100%', left: '50%', transform: 'translateX(-50%) translateY(-50%)' },
+    bottom: { bottom: '100%', left: '50%', transform: 'translateX(-50%) translateY(50%)' },
+    left: { left: '100%', top: '50%', transform: 'translateY(-50%) translateX(50%)' },
+    right: { right: '100%', top: '50%', transform: 'translateY(-50%) translateX(-50%)' },
   };
 
   return (
-    <div className="relative inline-block">
+    <div style={{ position: 'relative', display: 'inline-block' }}>
       <div
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
@@ -31,27 +38,32 @@ export function Tooltip({ content, children, position = 'top' }: TooltipProps) {
 
       {isVisible && (
         <div
-          className={`
-            absolute z-50 px-3 py-2 bg-gray-900 text-white text-sm rounded-md
-            whitespace-nowrap pointer-events-none animate-fadeIn
-            ${positionStyles[position]}
-          `}
+          className="animate-fadeIn"
+          style={{
+            position: 'absolute',
+            zIndex: 50,
+            paddingLeft: '0.75rem',
+            paddingRight: '0.75rem',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
+            backgroundColor: '#111827',
+            color: 'var(--color-white)',
+            fontSize: '0.875rem',
+            borderRadius: 'var(--radius-md)',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            ...positionMap[position],
+          }}
         >
           {content}
-          {/* Arrow */}
           <div
-            className={`
-              absolute w-2 h-2 bg-gray-900 rotate-45
-              ${
-                position === 'top'
-                  ? 'top-full left-1/2 -translate-x-1/2 -translate-y-1/2'
-                  : position === 'bottom'
-                    ? 'bottom-full left-1/2 -translate-x-1/2 translate-y-1/2'
-                    : position === 'left'
-                      ? 'left-full top-1/2 -translate-y-1/2 translate-x-1/2'
-                      : 'right-full top-1/2 -translate-y-1/2 -translate-x-1/2'
-              }
-            `}
+            style={{
+              position: 'absolute',
+              width: '0.5rem',
+              height: '0.5rem',
+              backgroundColor: '#111827',
+              ...arrowPositionMap[position],
+            }}
           />
         </div>
       )}

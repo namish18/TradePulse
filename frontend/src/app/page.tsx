@@ -17,26 +17,44 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-primary-dark flex flex-col">
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-primary-dark)', display: 'flex', flexDirection: 'column' }}>
       <Header />
 
-      <main className="flex-1">
+      <main style={{ flex: 1 }}>
         {/* Hero Section */}
-        <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-20 max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <section
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
+            paddingTop: '5rem',
+            paddingBottom: '5rem',
+            maxWidth: '80rem',
+            margin: '0 auto',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+              gap: '3rem',
+              alignItems: 'center',
+            }}
+          >
             <div>
-              <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 style={{ fontSize: '3rem', fontWeight: '700', color: 'var(--color-white)', marginBottom: '1.5rem', lineHeight: '1.2' }}>
                 Advanced <span className="text-gradient">Trading Analytics</span>
               </h1>
-              <p className="text-lg text-gray-300 mb-8 leading-relaxed">
+              <p style={{ fontSize: '1.125rem', color: 'var(--color-gray-300)', marginBottom: '2rem', lineHeight: '1.6' }}>
                 Professional-grade risk management and trading analytics platform with
                 real-time market data, WebSocket subscriptions, and advanced analytics.
               </p>
-              <div className="flex gap-4">
+              <div style={{ display: 'flex', gap: '1rem' }}>
                 {isAuthenticated ? (
                   <Link href="/dashboard">
-                    <Button size="lg" className="gap-2">
-                      Go to Dashboard <ArrowRight className="w-5 h-5" />
+                    <Button size="lg" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      Go to Dashboard <ArrowRight style={{ width: '1.25rem', height: '1.25rem' }} />
                     </Button>
                   </Link>
                 ) : (
@@ -55,17 +73,42 @@ export default function Home() {
             </div>
 
             {/* Hero Image */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-light to-danger opacity-20 blur-3xl rounded-full" />
-              <div className="relative glass rounded-2xl p-8">
-                <div className="space-y-4">
-                  <div className="h-2 bg-gradient-to-r from-primary-light to-danger rounded-full" />
-                  <div className="h-32 bg-primary-dark rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-16 h-16 text-danger opacity-20" />
+            <div style={{ position: 'relative' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to right, var(--color-primary-light), var(--color-danger))',
+                  opacity: 0.2,
+                  filter: 'blur(80px)',
+                  borderRadius: '9999px',
+                }}
+              />
+              <div
+                className="glass"
+                style={{
+                  position: 'relative',
+                  borderRadius: 'var(--radius-2xl)',
+                  padding: '2rem',
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ height: '0.5rem', background: 'linear-gradient(to right, var(--color-primary-light), var(--color-danger))', borderRadius: '9999px' }} />
+                  <div
+                    style={{
+                      height: '8rem',
+                      backgroundColor: 'var(--color-primary-dark)',
+                      borderRadius: 'var(--radius-lg)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <BarChart3 style={{ width: '4rem', height: '4rem', color: 'var(--color-danger)', opacity: 0.2 }} />
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                     {[...Array(4)].map((_, i) => (
-                      <div key={i} className="h-8 bg-primary-dark rounded opacity-50" />
+                      <div key={i} style={{ height: '2rem', backgroundColor: 'var(--color-primary-dark)', borderRadius: 'var(--radius-md)', opacity: 0.5 }} />
                     ))}
                   </div>
                 </div>
@@ -75,14 +118,33 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="bg-primary-light/5 px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">Powerful Features</h2>
-              <p className="text-lg text-gray-300">Everything you need for professional trading</p>
+        <section
+          id="features"
+          style={{
+            backgroundColor: 'rgba(2, 6, 111, 0.05)',
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
+            paddingTop: '5rem',
+            paddingBottom: '5rem',
+          }}
+        >
+          <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+              <h2 style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--color-white)', marginBottom: '1rem' }}>
+                Powerful Features
+              </h2>
+              <p style={{ fontSize: '1.125rem', color: 'var(--color-gray-300)' }}>
+                Everything you need for professional trading
+              </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '2rem',
+              }}
+            >
               {[
                 {
                   icon: TrendingUp,
@@ -120,12 +182,14 @@ export default function Home() {
               ].map((feature, i) => {
                 const Icon = feature.icon;
                 return (
-                  <div key={i} className="glass p-8 rounded-lg">
-                    <div className="w-12 h-12 bg-danger/10 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-danger" />
+                  <div key={i} className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ width: '3rem', height: '3rem', backgroundColor: 'rgba(255, 7, 58, 0.1)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                      <Icon style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-danger)' }} />
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-400">{feature.description}</p>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: 'var(--color-white)', marginBottom: '0.5rem' }}>
+                      {feature.title}
+                    </h3>
+                    <p style={{ color: 'var(--color-gray-400)' }}>{feature.description}</p>
                   </div>
                 );
               })}
@@ -134,13 +198,32 @@ export default function Home() {
         </section>
 
         {/* Tech Stack Section */}
-        <section className="px-4 sm:px-6 lg:px-8 py-20 max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Modern Tech Stack</h2>
-            <p className="text-lg text-gray-300">Built with cutting-edge technologies</p>
+        <section
+          style={{
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
+            paddingTop: '5rem',
+            paddingBottom: '5rem',
+            maxWidth: '80rem',
+            margin: '0 auto',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--color-white)', marginBottom: '1rem' }}>
+              Modern Tech Stack
+            </h2>
+            <p style={{ fontSize: '1.125rem', color: 'var(--color-gray-300)' }}>
+              Built with cutting-edge technologies
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+            }}
+          >
             {[
               'Next.js 15',
               'React 19 Server Components',
@@ -148,12 +231,12 @@ export default function Home() {
               'Apollo Client',
               'GraphQL',
               'WebSocket (graphql-ws)',
-              'Tailwind CSS 4',
+              'Pure CSS (No Tailwind)',
               'Edge Runtime',
               'PostgreSQL',
             ].map((tech) => (
-              <div key={tech} className="glass p-4 rounded-lg text-center">
-                <p className="text-white font-medium">{tech}</p>
+              <div key={tech} className="glass" style={{ padding: '1rem', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+                <p style={{ color: 'var(--color-white)', fontWeight: '500' }}>{tech}</p>
               </div>
             ))}
           </div>
@@ -161,12 +244,41 @@ export default function Home() {
 
         {/* CTA Section */}
         {!isAuthenticated && (
-          <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 py-20 max-w-7xl mx-auto">
-            <div className="glass rounded-2xl p-12 text-center relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-light to-danger opacity-10 rounded-2xl" />
-              <div className="relative">
-                <h2 className="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
-                <p className="text-lg text-gray-300 mb-8">
+          <section
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
+              paddingTop: '5rem',
+              paddingBottom: '5rem',
+              maxWidth: '80rem',
+              margin: '0 auto',
+            }}
+          >
+            <div
+              className="glass"
+              style={{
+                borderRadius: 'var(--radius-2xl)',
+                padding: '3rem',
+                textAlign: 'center',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to right, var(--color-primary-light), var(--color-danger))',
+                  opacity: 0.1,
+                  borderRadius: 'var(--radius-2xl)',
+                }}
+              />
+              <div style={{ position: 'relative' }}>
+                <h2 style={{ fontSize: '2.25rem', fontWeight: '700', color: 'var(--color-white)', marginBottom: '1rem' }}>
+                  Ready to Get Started?
+                </h2>
+                <p style={{ fontSize: '1.125rem', color: 'var(--color-gray-300)', marginBottom: '2rem' }}>
                   Join thousands of traders using our platform
                 </p>
                 <Link href="/login">

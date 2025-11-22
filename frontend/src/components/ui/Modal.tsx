@@ -32,40 +32,99 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
   if (!isOpen) return null;
 
-  const sizeStyles = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
+  const sizeMap: Record<'sm' | 'md' | 'lg', string> = {
+    sm: '28rem',
+    md: '32rem',
+    lg: '36rem',
   };
 
   return (
     <>
-      {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 40,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+        }}
         onClick={onClose}
         role="presentation"
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className={`${sizeStyles[size]} w-full bg-primary-dark rounded-lg shadow-neon-lg border border-danger/20 animate-slideIn`}>
-          {/* Header */}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 50,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem',
+        }}
+      >
+        <div
+          className="animate-slideIn"
+          style={{
+            maxWidth: sizeMap[size],
+            width: '100%',
+            backgroundColor: 'var(--color-primary-dark)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-neon-lg)',
+            border: '1px solid rgba(255, 7, 58, 0.2)',
+          }}
+        >
           {title && (
-            <div className="flex items-center justify-between px-6 py-4 border-b border-primary-light/10">
-              <h2 className="text-lg font-semibold text-white">{title}</h2>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingLeft: '1.5rem',
+                paddingRight: '1.5rem',
+                paddingTop: '1rem',
+                paddingBottom: '1rem',
+                borderBottom: '1px solid rgba(2, 6, 111, 0.1)',
+              }}
+            >
+              <h2 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--color-white)' }}>
+                {title}
+              </h2>
               <button
                 onClick={onClose}
-                className="p-1 hover:bg-white/10 rounded-md transition-colors"
+                style={{
+                  padding: '0.25rem',
+                  backgroundColor: 'transparent',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'background-color var(--transition-base)',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+                }}
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5" />
+                <X style={{ width: '1.25rem', height: '1.25rem' }} />
               </button>
             </div>
           )}
 
-          {/* Content */}
-          <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">{children}</div>
+          <div
+            style={{
+              paddingLeft: '1.5rem',
+              paddingRight: '1.5rem',
+              paddingTop: '1rem',
+              paddingBottom: '1rem',
+              maxHeight: '70vh',
+              overflowY: 'auto',
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </>
