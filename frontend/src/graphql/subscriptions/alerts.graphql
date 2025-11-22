@@ -1,0 +1,38 @@
+subscription OnRiskAlert {
+  riskAlert {
+    id
+    severity
+    message
+    timestamp
+    resolved
+    recommendation
+  }
+}
+
+subscription OnPriceAlert($symbol: String!, $threshold: Float!, $direction: Direction!) {
+  priceAlert(symbol: $symbol, threshold: $threshold, direction: $direction) {
+    symbol
+    currentPrice
+    alertPrice
+    timestamp
+  }
+}
+
+subscription OnRiskMetricAlert {
+  riskMetricAlert {
+    metric
+    value
+    threshold
+    status
+    timestamp
+  }
+}
+
+subscription OnMarginAlert {
+  marginAlert {
+    usedMargin
+    availableMargin
+    usagePercent
+    timestamp
+  }
+}

@@ -1,0 +1,83 @@
+query GetPortfolio {
+  portfolio {
+    id
+    userId
+    totalValue
+    cashBalance
+    usedMargin
+    availableMargin
+    positions {
+      id
+      symbol
+      quantity
+      averageCost
+      currentPrice
+      pnl
+      pnlPercent
+      exposure
+    }
+    updatedAt
+  }
+}
+
+query GetPositions($limit: Int, $offset: Int) {
+  positions(limit: $limit, offset: $offset) {
+    id
+    symbol
+    quantity
+    averageCost
+    currentPrice
+    pnl
+    pnlPercent
+    exposure
+    createdAt
+    updatedAt
+  }
+}
+
+query GetPosition($positionId: ID!) {
+  position(id: $positionId) {
+    id
+    symbol
+    quantity
+    averageCost
+    currentPrice
+    pnl
+    pnlPercent
+    exposure
+    trades {
+      id
+      price
+      quantity
+      timestamp
+      side
+    }
+  }
+}
+
+query GetOrders($status: OrderStatus, $limit: Int, $offset: Int) {
+  orders(status: $status, limit: $limit, offset: $offset) {
+    id
+    symbol
+    type
+    side
+    quantity
+    price
+    status
+    filledQuantity
+    averageFillPrice
+    createdAt
+    updatedAt
+  }
+}
+
+query GetTransactionHistory($limit: Int, $offset: Int) {
+  transactionHistory(limit: $limit, offset: $offset) {
+    id
+    type
+    amount
+    fee
+    timestamp
+    description
+  }
+}

@@ -1,0 +1,19 @@
+fragment PriceFields on MarketData {
+  symbol
+  price
+  change
+  changePercent
+  high
+  low
+  volume
+  timestamp
+}
+
+fragment TickerFields on Ticker {
+  symbol
+  price
+  bidPrice
+  askPrice
+  volume24h
+  change24h
+}

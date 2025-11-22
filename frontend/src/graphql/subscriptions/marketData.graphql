@@ -1,0 +1,49 @@
+subscription OnMarketDataUpdated($symbols: [String!]!) {
+  marketDataUpdated(symbols: $symbols) {
+    symbol
+    price
+    change
+    changePercent
+    high
+    low
+    volume
+    timestamp
+  }
+}
+
+subscription OnTradeExecuted($symbols: [String!]!) {
+  tradeExecuted(symbols: $symbols) {
+    id
+    symbol
+    price
+    quantity
+    timestamp
+    side
+  }
+}
+
+subscription OnOrderBookUpdated($symbol: String!) {
+  orderBookUpdated(symbol: $symbol) {
+    symbol
+    bids {
+      price
+      quantity
+    }
+    asks {
+      price
+      quantity
+    }
+    timestamp
+  }
+}
+
+subscription OnCandlestickUpdated($symbol: String!, $interval: String!) {
+  candlestickUpdated(symbol: $symbol, interval: $interval) {
+    timestamp
+    open
+    high
+    low
+    close
+    volume
+  }
+}

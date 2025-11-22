@@ -1,0 +1,62 @@
+mutation CreateOrder(
+  $symbol: String!
+  $type: OrderType!
+  $side: OrderSide!
+  $quantity: Float!
+  $price: Float
+) {
+  createOrder(
+    input: {
+      symbol: $symbol
+      type: $type
+      side: $side
+      quantity: $quantity
+      price: $price
+    }
+  ) {
+    id
+    symbol
+    type
+    side
+    quantity
+    price
+    status
+    createdAt
+  }
+}
+
+mutation UpdateOrder($orderId: ID!, $price: Float, $quantity: Float) {
+  updateOrder(id: $orderId, input: { price: $price, quantity: $quantity }) {
+    id
+    symbol
+    price
+    quantity
+    status
+    updatedAt
+  }
+}
+
+mutation CancelOrder($orderId: ID!) {
+  cancelOrder(id: $orderId) {
+    id
+    status
+    updatedAt
+  }
+}
+
+mutation CancelAllOrders {
+  cancelAllOrders {
+    count
+    timestamp
+  }
+}
+
+mutation ClosePosition($positionId: ID!, $quantity: Float) {
+  closePosition(id: $positionId, quantity: $quantity) {
+    id
+    quantity
+    pnl
+    status
+    timestamp
+  }
+}

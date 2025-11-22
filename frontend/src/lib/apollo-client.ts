@@ -1,67 +1,66 @@
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, split } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink, split } from '@apollo/client';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
-import { registerApolloClient } from '@apollo/client-integration-nextjs';
 
-
-
-// Server-side HTTP Link for SSR/RSC
 const httpLink = new HttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_HTTP_URL || 'http://localhost:4000/graphql',
-  fetchOptions: { cache: 'no-store' },
   credentials: 'include',
+  headers: {
+    'Apollo-Require-Preflight': 'true',
+  },
 });
 
-// Client-side WebSocket Link for subscriptions
-const createWsLink = () => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
+let wsLink: GraphQLWsLink | null = null;
 
-  return new GraphQLWsLink(
+if (typeof window !== 'undefined') {
+  wsLink = new GraphQLWsLink(
     createClient({
       url: process.env.NEXT_PUBLIC_GRAPHQL_WS_URL || 'ws://localhost:4000/graphql',
-      connectionParams: async () => {
-        // Get auth token from cookie or localStorage
+      shouldRetry: () => true,
+      keepAlive: 30_000,
+      retryAttempts: 5,
+      connectionParams: () => {
         const token = localStorage.getItem('auth_token');
-        return {
-          authorization: token ? `Bearer ${token}` : '',
-        };
+        return token
+          ? {
+              authorization: `Bearer ${token}`,
+            }
+          : {};
+      },
+      on: {
+        connected: () => console.log('WebSocket connected'),
+        error: (error) => console.error('WebSocket error:', error),
+        closed: () => console.log('WebSocket closed'),
       },
     })
   );
-};
+}
 
-// Split link: HTTP for queries/mutations, WebSocket for subscriptions
-const createSplitLink = () => {
-  const wsLink = createWsLink();
-  
-  if (!wsLink) {
-    return httpLink;
-  }
+const splitLink =
+  typeof window !== 'undefined' && wsLink
+    ? split(
+        ({ query }) => {
+          const definition = getMainDefinition(query);
+          return (
+            definition.kind === 'OperationDefinition' &&
+            definition.operation === 'subscription'
+          );
+        },
+        wsLink,
+        httpLink
+      )
+    : httpLink;
 
-  return split(
-    ({ query }) => {
-      const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
-    },
-    wsLink,
-    httpLink
-  );
-};
-
-// In-memory cache configuration
-const createCache = () => {
-  return new InMemoryCache({
+export const apolloClient = new ApolloClient({
+  ssrMode: typeof window === 'undefined',
+  link: splitLink,
+  cache: new InMemoryCache({
     typePolicies: {
       Query: {
         fields: {
           marketData: {
-            merge(existing = [], incoming: any[]) {
+            merge(existing, incoming) {
               return incoming;
             },
           },
@@ -70,52 +69,23 @@ const createCache = () => {
               return incoming;
             },
           },
+          riskMetrics: {
+            merge(existing, incoming) {
+              return incoming;
+            },
+          },
         },
       },
-      MarketTick: {
-        keyFields: ['symbol', 'timestamp'],
-      },
-      Position: {
-        keyFields: ['id'],
-      },
-      RiskMetric: {
-        keyFields: ['portfolioId', 'timestamp'],
-      },
     },
-  });
-};
-
-// Server-side Apollo Client for RSC
-export const { getClient: getServerClient } = registerApolloClient(() => {
-  return new ApolloClient({
-    cache: createCache(),
-    link: httpLink,
-    defaultOptions: {
-      query: {
-        errorPolicy: 'all',
-        fetchPolicy: 'no-cache',
-      },
+  }),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all',
     },
-  });
+    query: {
+      fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
+    },
+  },
 });
-
-// Client-side Apollo Client
-export const createClientSideClient = (): ApolloClient => {
-  return new ApolloClient({
-    cache: createCache(),
-    link: createSplitLink(),
-    defaultOptions: {
-      watchQuery: {
-        errorPolicy: 'all',
-        fetchPolicy: 'cache-and-network',
-      },
-      query: {
-        errorPolicy: 'all',
-        fetchPolicy: 'network-only',
-      },
-      mutate: {
-        errorPolicy: 'all',
-      },
-    }
-  });
-};

@@ -1,0 +1,70 @@
+query GetRiskMetrics {
+  riskMetrics {
+    id
+    portfolioId
+    var95
+    var99
+    expectedShortfall
+    beta
+    sharpeRatio
+    maxDrawdown
+    volatility
+    timestamp
+  }
+}
+
+query GetRiskExposure {
+  riskExposure {
+    totalExposure
+    byAsset {
+      asset
+      value
+      percentage
+      currency
+    }
+    bySector {
+      sector
+      value
+      percentage
+    }
+    byRegion {
+      region
+      value
+      percentage
+    }
+  }
+}
+
+query GetStressScenarios {
+  stressScenarios {
+    id
+    name
+    description
+    marketShock
+    volatilityShock
+    portfolioDelta
+    affectedPositions {
+      symbol
+      estimatedImpact
+    }
+  }
+}
+
+query GetRiskAlerts($severity: AlertSeverity, $resolved: Boolean, $limit: Int) {
+  riskAlerts(severity: $severity, resolved: $resolved, limit: $limit) {
+    id
+    severity
+    message
+    timestamp
+    resolved
+    recommendation
+  }
+}
+
+query GetVaRHistory($days: Int) {
+  varHistory(days: $days) {
+    timestamp
+    var95
+    var99
+  }
+}

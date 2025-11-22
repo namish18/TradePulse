@@ -1,0 +1,46 @@
+subscription OnPortfolioUpdated {
+  portfolioUpdated {
+    id
+    totalValue
+    cashBalance
+    positions {
+      id
+      symbol
+      quantity
+      currentPrice
+      pnl
+      pnlPercent
+      exposure
+    }
+    timestamp
+  }
+}
+
+subscription OnPositionUpdated($symbolFilter: [String!]) {
+  positionUpdated(symbolFilter: $symbolFilter) {
+    id
+    symbol
+    quantity
+    averageCost
+    currentPrice
+    pnl
+    pnlPercent
+    exposure
+    timestamp
+  }
+}
+
+subscription OnOrderUpdated {
+  orderUpdated {
+    id
+    symbol
+    type
+    side
+    quantity
+    price
+    status
+    filledQuantity
+    averageFillPrice
+    timestamp
+  }
+}
