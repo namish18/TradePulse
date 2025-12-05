@@ -1,0 +1,88 @@
+.container {
+    padding: var(--spacing-xl);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.title {
+    font-size: var(--font-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+}
+
+.section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.cardHeader {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cardTitle {
+    font-size: var(--font-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+}
+
+.cardBody {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.setting:last-child {
+    border-bottom: none;
+}
+
+.settingLabel {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-white);
+    margin-bottom: var(--spacing-xs);
+}
+
+.settingDescription {
+    font-size: var(--font-sm);
+    color: var(--color-gray-400);
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.infoText {
+    color: var(--color-gray-400);
+    font-size: var(--font-sm);
+    line-height: var(--line-height-relaxed);
+}
+
+.apiKey {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code {
+    font-family: 'Courier New', monospace;
+    color: var(--color-accent-red);
+    font-size: var(--font-sm);
+}

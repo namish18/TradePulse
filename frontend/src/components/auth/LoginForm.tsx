@@ -1,102 +1,97 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui';
-import { useAuth } from '@/hooks';
+import React, { useState } from 'react';
+import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { isValidEmail } from '@/utils/validation';
+import styles from './LoginForm.module.css';
 
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [generalError, setGeneralError] = useState('');
 
-  const { login } = useAuth();
-  const router = useRouter();
+    const { login, isLoading } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-    try {
-      await login(email, password);
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+        // Reset errors
+        setEmailError('');
+        setPasswordError('');
+        setGeneralError('');
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    paddingLeft: '1rem',
-    paddingRight: '1rem',
-    paddingTop: '0.5rem',
-    paddingBottom: '0.5rem',
-    backgroundColor: 'var(--color-primary-dark)',
-    border: '1px solid rgba(2, 6, 111, 0.2)',
-    borderRadius: 'var(--radius-lg)',
-    color: 'var(--color-white)',
-    fontSize: '1rem',
-    transition: 'border-color var(--transition-base)',
-    fontFamily: 'inherit',
-  };
+        // Validation
+        if (!email) {
+            setEmailError('Email is required');
+            return;
+        }
 
-  return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {error && (
-        <div style={{ padding: '1rem', backgroundColor: 'rgba(127, 29, 29, 0.2)', border: '1px solid #f87171', borderRadius: 'var(--radius-lg)', color: '#fca5a5' }}>
-          {error}
-        </div>
-      )}
+        if (!isValidEmail(email)) {
+            setEmailError('Invalid email address');
+            return;
+        }
 
-      <div>
-        <label htmlFor="email" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-300)', marginBottom: '0.5rem' }}>
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          required
-          style={inputStyle}
-          onFocus={(e) => {
-            (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--color-danger)';
-          }}
-          onBlur={(e) => {
-            (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(2, 6, 111, 0.2)';
-          }}
-        />
-      </div>
+        if (!password) {
+            setPasswordError('Password is required');
+            return;
+        }
 
-      <div>
-        <label htmlFor="password" style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-gray-300)', marginBottom: '0.5rem' }}>
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          required
-          style={inputStyle}
-          onFocus={(e) => {
-            (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--color-danger)';
-          }}
-          onBlur={(e) => {
-            (e.currentTarget as HTMLInputElement).style.borderColor = 'rgba(2, 6, 111, 0.2)';
-          }}
-        />
-      </div>
+        // Attempt login
+        const result = await login({ email, password });
 
-      <Button type="submit" loading={loading} style={{ width: '100%' }}>
-        Sign In
-      </Button>
-    </form>
-  );
+        if (!result.success) {
+            setGeneralError(result.error || 'Login failed');
+        }
+    };
+
+    return (
+        <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Welcome Back</h1>
+                <p className={styles.subtitle}>Sign in to your TradePulse account</p>
+            </div>
+
+            {generalError && (
+                <div className={styles.errorAlert}>{generalError}</div>
+            )}
+
+            <Input
+                type="email"
+                label="Email Address"
+                placeholder="trader@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={emailError}
+                disabled={isLoading}
+            />
+
+            <Input
+                type="password"
+                label="Password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={passwordError}
+                disabled={isLoading}
+            />
+
+            <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                loading={isLoading}
+                className={styles.submitButton}
+            >
+                Sign In
+            </Button>
+
+            <p className={styles.footer}>
+                Don't have an account? <a href="/signup" className={styles.link}>Sign up</a>
+            </p>
+        </form>
+    );
 }

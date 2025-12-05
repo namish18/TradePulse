@@ -1,70 +1,44 @@
-query GetRiskMetrics {
-  riskMetrics {
-    id
-    portfolioId
+# GraphQL Queries - Risk Metrics
+
+query GetRiskMetrics($portfolioId: ID!) {
+  riskMetrics(portfolioId: $portfolioId) {
     var95
     var99
-    expectedShortfall
-    beta
     sharpeRatio
+    beta
     maxDrawdown
     volatility
-    timestamp
   }
 }
 
-query GetRiskExposure {
-  riskExposure {
-    totalExposure
-    byAsset {
-      asset
-      value
-      percentage
-      currency
-    }
-    bySector {
-      sector
-      value
-      percentage
-    }
-    byRegion {
-      region
-      value
-      percentage
-    }
+query GetGreeks($portfolioId: ID!) {
+  greeks(portfolioId: $portfolioId) {
+    delta
+    gamma
+    theta
+    vega
+    rho
   }
 }
 
-query GetStressScenarios {
-  stressScenarios {
+query GetStressScenarios($portfolioId: ID!) {
+  stressScenarios(portfolioId: $portfolioId) {
     id
     name
     description
-    marketShock
-    volatilityShock
-    portfolioDelta
-    affectedPositions {
-      symbol
-      estimatedImpact
-    }
+    impact
+    impactPercent
+    probability
   }
 }
 
-query GetRiskAlerts($severity: AlertSeverity, $resolved: Boolean, $limit: Int) {
-  riskAlerts(severity: $severity, resolved: $resolved, limit: $limit) {
+query GetAlerts($userId: ID!, $unreadOnly: Boolean) {
+  alerts(userId: $userId, unreadOnly: $unreadOnly) {
     id
+    type
     severity
     message
     timestamp
-    resolved
-    recommendation
-  }
-}
-
-query GetVaRHistory($days: Int) {
-  varHistory(days: $days) {
-    timestamp
-    var95
-    var99
+    isRead
   }
 }

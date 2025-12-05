@@ -1,23 +1,44 @@
+// User authentication types
+
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'admin' | 'user';
-  createdAt: string;
-  updatedAt: string;
+    id: string;
+    email: string;
+    name: string;
+    role: 'admin' | 'trader' | 'viewer';
+    createdAt: Date;
 }
 
 export interface Session {
-  user: User;
-  token: string;
-  expiresAt: number;
+    userId: string;
+    email: string;
+    role: string;
+    expiresAt: number;
 }
 
-export interface AuthContext {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  isAuthenticated: boolean;
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export interface JWTPayload {
+    userId: string;
+    email: string;
+    role: string;
+    iat?: number;
+    exp?: number;
+}
+
+export interface AuthResponse {
+    success: boolean;
+    user?: User;
+    token?: string;
+    error?: string;
+}
+
+export interface AuthContextType {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+    logout: () => Promise<void>;
 }

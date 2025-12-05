@@ -1,75 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { WebSocketManager, WebSocketConfig } from '@/lib/websocket';
+import { useState, useEffect } from 'react';
+import { getConnectionStatus, closeWebSocketConnection } from '@/lib/websocket';
 
-interface UseWebSocketOptions {
-  url: string;
-  reconnectInterval?: number;
-  maxReconnectAttempts?: number;
-  autoConnect?: boolean;
-}
+type ConnectionStatus = 'connected' | 'connecting' | 'disconnected';
 
-export function useWebSocket<T>(
-  options: UseWebSocketOptions
-): {
-  data: T | null;
-  isConnected: boolean;
-  error: Error | null;
-  send: (type: string, payload?: any) => void;
-  subscribe: (type: string, handler: (data: any) => void) => () => void;
-} {
-  const [data, setData] = useState<T | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+export function useWebSocket() {
+    const [status, setStatus] = useState<ConnectionStatus>('disconnected');
+    const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
-  const wsManagerRef = useRef<WebSocketManager | null>(null);
+    useEffect(() => {
+        // Check connection status periodically
+        const interval = setInterval(() => {
+            const currentStatus = getConnectionStatus();
+            setStatus(currentStatus);
+        }, 1000);
 
-  useEffect(() => {
-    const config: WebSocketConfig = {
-      url: options.url,
-      reconnectInterval: options.reconnectInterval,
-      maxReconnectAttempts: options.maxReconnectAttempts,
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    const disconnect = () => {
+        closeWebSocketConnection();
+        setStatus('disconnected');
     };
 
-    wsManagerRef.current = new WebSocketManager(config);
-
-    if (options.autoConnect !== false) {
-      wsManagerRef.current
-        .connect()
-        .then(() => setIsConnected(true))
-        .catch((err) => setError(err));
-    }
-
-    return () => {
-      wsManagerRef.current?.disconnect();
+    return {
+        status,
+        isConnected: status === 'connected',
+        isConnecting: status === 'connecting',
+        reconnectAttempts,
+        disconnect,
     };
-  }, [options.url, options.reconnectInterval, options.maxReconnectAttempts, options.autoConnect]);
-
-  const send = useCallback((type: string, payload?: any) => {
-    if (wsManagerRef.current) {
-      wsManagerRef.current.send(type, payload);
-    }
-  }, []);
-
-  const subscribe = useCallback(
-    (type: string, handler: (data: any) => void) => {
-      if (wsManagerRef.current) {
-        return wsManagerRef.current.subscribe(type, (payload) => {
-          setData(payload);
-          handler(payload);
-        });
-      }
-      return () => {};
-    },
-    []
-  );
-
-  return {
-    data,
-    isConnected,
-    error,
-    send,
-    subscribe,
-  };
 }

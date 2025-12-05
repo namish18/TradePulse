@@ -1,6 +1,5 @@
-schema: 'http://localhost:4000/graphql'
+schema: ${NEXT_PUBLIC_GRAPHQL_HTTP_URL}
 documents: 'src/graphql/**/*.graphql'
 extensions:
-  codegen:
-    silent: false
-    onError: 'ignore'
+  languageService:
+    cacheSchemaFileForLookup: true

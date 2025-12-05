@@ -1,51 +1,20 @@
-mutation UpdateUserProfile($name: String, $email: String) {
-  updateUserProfile(input: { name: $name, email: $email }) {
-    id
-    name
-    email
-    updatedAt
-  }
-}
+# GraphQL Mutations - Settings
 
-mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
-  changePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
+mutation UpdateUserSettings($input: SettingsInput!) {
+  updateSettings(input: $input) {
     success
     message
   }
 }
 
-mutation UpdateNotificationPreferences($preferences: NotificationPreferencesInput!) {
-  updateNotificationPreferences(input: $preferences) {
-    emailNotifications
-    pushNotifications
-    smsNotifications
-    alertThresholds {
-      priceChange
-      riskMetrics
-      orders
-    }
-  }
-}
-
-mutation UpdateRiskLimits($limits: RiskLimitsInput!) {
-  updateRiskLimits(input: $limits) {
-    dailyLoss
-    maxLeverage
-    maxExposure
-  }
-}
-
-mutation EnableTwoFactor {
-  enableTwoFactor {
-    secret
-    qrCode
-    backupCodes
-  }
-}
-
-mutation DisableTwoFactor($code: String!) {
-  disableTwoFactor(code: $code) {
+mutation MarkAlertAsRead($alertId: ID!) {
+  markAlertAsRead(alertId: $alertId) {
     success
-    message
+  }
+}
+
+mutation MarkAllAlertsAsRead($userId: ID!) {
+  markAllAlertsAsRead(userId: $userId) {
+    success
   }
 }

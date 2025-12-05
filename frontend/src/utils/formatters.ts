@@ -1,75 +1,79 @@
-export function formatCurrency(value: number, symbol: string = '$'): string {
-  return `${symbol}${value.toFixed(2)}`;
+// Formatting utilities for displaying data
+
+/**
+ * Format number as currency
+ */
+export function formatCurrency(value: number, currency: string = 'USD'): string {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
 }
 
-export function formatPercentage(value: number, decimals: number = 2): string {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
+/**
+ * Format number as percentage
+ */
+export function formatPercent(value: number, decimals: number = 2): string {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
 }
 
+/**
+ * Format large numbers with K, M, B suffixes
+ */
+export function formatCompactNumber(value: number): string {
+    if (Math.abs(value) >= 1_000_000_000) {
+        return `${(value / 1_000_000_000).toFixed(2)}B`;
+    }
+    if (Math.abs(value) >= 1_000_000) {
+        return `${(value / 1_000_000).toFixed(2)}M`;
+    }
+    if (Math.abs(value) >= 1_000) {
+        return `${(value / 1_000).toFixed(2)}K`;
+    }
+    return value.toFixed(2);
+}
+
+/**
+ * Format number with thousand separators
+ */
 export function formatNumber(value: number, decimals: number = 2): string {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    }).format(value);
 }
 
-export function formatLargeNumber(value: number): string {
-  if (Math.abs(value) >= 1e9) {
-    return `${(value / 1e9).toFixed(2)}B`;
-  }
-  if (Math.abs(value) >= 1e6) {
-    return `${(value / 1e6).toFixed(2)}M`;
-  }
-  if (Math.abs(value) >= 1e3) {
-    return `${(value / 1e3).toFixed(2)}K`;
-  }
-  return value.toFixed(2);
+/**
+ * Format price with appropriate decimal places
+ */
+export function formatPrice(price: number, symbol?: string): string {
+    // Crypto and forex typically need more decimals
+    const decimals = price < 1 ? 6 : price < 100 ? 4 : 2;
+    return formatNumber(price, decimals);
 }
 
-export function formatDate(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+/**
+ * Format change value with color indicator
+ */
+export function formatChange(change: number): { text: string; isPositive: boolean } {
+    return {
+        text: formatPercent(change),
+        isPositive: change >= 0,
+    };
 }
 
-export function formatDateTime(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
+/**
+ * Format trading volume
+ */
+export function formatVolume(volume: number): string {
+    return formatCompactNumber(volume);
 }
 
-export function formatTime(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-}
-
-export function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
-}
-
-export function truncateString(str: string, length: number): string {
-  if (str.length <= length) return str;
-  return `${str.substring(0, length)}...`;
-}
-
-export function formatAddress(address: string): string {
-  if (address.length <= 10) return address;
-  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+/**
+ * Format market cap
+ */
+export function formatMarketCap(value: number): string {
+    return formatCompactNumber(value);
 }

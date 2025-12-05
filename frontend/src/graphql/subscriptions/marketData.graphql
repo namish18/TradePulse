@@ -1,49 +1,35 @@
-subscription OnMarketDataUpdated($symbols: [String!]!) {
+# GraphQL Subscriptions - Market Data
+
+subscription MarketDataUpdated($symbols: [String!]!) {
   marketDataUpdated(symbols: $symbols) {
-    symbol
-    price
-    change
-    changePercent
-    high
-    low
-    volume
-    timestamp
+    ...PriceFields
   }
 }
 
-subscription OnTradeExecuted($symbols: [String!]!) {
-  tradeExecuted(symbols: $symbols) {
-    id
-    symbol
-    price
-    quantity
-    timestamp
-    side
-  }
-}
-
-subscription OnOrderBookUpdated($symbol: String!) {
+subscription OrderBookUpdated($symbol: String!) {
   orderBookUpdated(symbol: $symbol) {
     symbol
     bids {
       price
       quantity
+      total
     }
     asks {
       price
       quantity
+      total
     }
     timestamp
   }
 }
 
-subscription OnCandlestickUpdated($symbol: String!, $interval: String!) {
-  candlestickUpdated(symbol: $symbol, interval: $interval) {
+subscription TradeStream($symbol: String!) {
+  tradeStream(symbol: $symbol) {
+    id
+    symbol
+    price
+    quantity
+    side
     timestamp
-    open
-    high
-    low
-    close
-    volume
   }
 }

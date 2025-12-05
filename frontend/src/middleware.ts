@@ -1,46 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken } from './lib/auth';
 
 // Routes that require authentication
-const protectedRoutes = ['/dashboard', '/settings', '/api/protected'];
+const protectedRoutes = ['/dashboard'];
 
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+// Routes that should redirect to dashboard if already authenticated
+const authRoutes = ['/login'];
 
-  // Check if the route is protected
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+export async function middleware(request: NextRequest) {
+    const { pathname } = request.nextUrl;
 
-  // Get auth token from cookies
-  const token = request.cookies.get('auth_token')?.value;
+    // Get token from cookie
+    const token = request.cookies.get('session')?.value;
 
-  // If trying to access protected route without token
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+    // Verify token
+    const session = token ? await verifyToken(token) : null;
+    const isAuthenticated = session !== null;
 
-  // If logged in and trying to access login page
-  if (token && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
+    // Check if route requires authentication
+    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+    const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
 
-  // Validate token on edge runtime
-  if (isProtectedRoute && token) {
-    // Token validation logic can be added here
-    // For now, we trust the token exists
-  }
+    // Redirect to login if accessing protected route without authentication
+    if (isProtectedRoute && !isAuthenticated) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('callbackUrl', pathname);
+        return NextResponse.redirect(loginUrl);
+    }
 
-  return NextResponse.next();
+    // Redirect to dashboard if accessing auth route while authenticated
+    if (isAuthRoute && isAuthenticated) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+
+    return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
-  ],
+    matcher: [
+        '/dashboard/:path*',
+        '/login',
+    ],
 };

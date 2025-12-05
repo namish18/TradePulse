@@ -1,0 +1,131 @@
+.container {
+    padding: var(--spacing-xl);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2xl);
+    gap: var(--spacing-lg);
+}
+
+.title {
+    font-size: var(--font-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+}
+
+.section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.sectionTitle {
+    font-size: var(--font-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+    margin-bottom: var(--spacing-lg);
+}
+
+.indicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.indexCard {
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.indexName {
+    font-size: var(--font-sm);
+    color: var(--color-gray-400);
+    margin-bottom: var(--spacing-sm);
+}
+
+.indexValue {
+    font-size: var(--font-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    margin-bottom: var(--spacing-xs);
+}
+
+.indexChange {
+    font-size: var(--font-base);
+    font-weight: var(--font-weight-semibold);
+}
+
+.positive {
+    color: var(--color-green-500);
+}
+
+.negative {
+    color: var(--color-red-500);
+}
+
+.cardHeader {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cardTitle {
+    font-size: var(--font-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+}
+
+.table {
+    padding: var(--spacing-lg);
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: var(--font-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-400);
+}
+
+.tableRow {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: center;
+    transition: background var(--transition-fast);
+}
+
+.tableRow:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.symbol {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+}
+
+.name {
+    color: var(--color-gray-300);
+    font-size: var(--font-sm);
+}
+
+.volume {
+    color: var(--color-gray-400);
+    font-size: var(--font-sm);
+}
+
+.chartPlaceholder {
+    padding: var(--spacing-4xl);
+    text-align: center;
+    color: var(--color-gray-400);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-lg);
+}

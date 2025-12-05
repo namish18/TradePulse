@@ -1,120 +1,127 @@
-import { Session, User } from '@/types/auth';
+import { SignJWT, jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
+import type { Session, JWTPayload } from '@/types/auth';
 
-const TOKEN_KEY = 'auth_token';
-const USER_KEY = 'auth_user';
-const EXPIRY_KEY = 'auth_expiry';
+const SECRET_KEY = process.env.SESSION_SECRET || 'default-secret-key-change-in-production';
+const secret = new TextEncoder().encode(SECRET_KEY);
 
-export function setAuthToken(token: string, expiresIn: number = 3600000): void {
-  if (typeof window === 'undefined') return;
+const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const COOKIE_NAME = 'session';
 
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(EXPIRY_KEY, (Date.now() + expiresIn).toString());
+/**
+ * Create a JWT token
+ */
+export async function createToken(payload: JWTPayload): Promise<string> {
+    const token = await new SignJWT(payload)
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .sign(secret);
+
+    return token;
 }
 
-export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-
-  const token = localStorage.getItem(TOKEN_KEY);
-  const expiry = localStorage.getItem(EXPIRY_KEY);
-
-  if (!token || !expiry) return null;
-
-  if (Date.now() > parseInt(expiry)) {
-    clearAuthData();
-    return null;
-  }
-
-  return token;
+/**
+ * Verify and decode JWT token
+ */
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
+    try {
+        const { payload } = await jwtVerify(token, secret);
+        return payload as JWTPayload;
+    } catch (error) {
+        console.error('Token verification failed:', error);
+        return null;
+    }
 }
 
-export function setUser(user: User): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-}
+/**
+ * Create session and set cookie
+ */
+export async function createSession(userId: string, email: string, role: string): Promise<Session> {
+    const expiresAt = Date.now() + SESSION_DURATION;
 
-export function getUser(): User | null {
-  if (typeof window === 'undefined') return null;
+    const session: Session = {
+        userId,
+        email,
+        role,
+        expiresAt,
+    };
 
-  const user = localStorage.getItem(USER_KEY);
-  return user ? JSON.parse(user) : null;
-}
-
-export function clearAuthData(): void {
-  if (typeof window === 'undefined') return;
-
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(EXPIRY_KEY);
-}
-
-export function isAuthenticated(): boolean {
-  return getAuthToken() !== null;
-}
-
-export async function validateSession(): Promise<boolean> {
-  const token = getAuthToken();
-  if (!token) return false;
-
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/validate`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const token = await createToken({
+        userId,
+        email,
+        role,
     });
 
-    if (!response.ok) {
-      clearAuthData();
-      return false;
+    // Set HTTP-only cookie
+    const cookieStore = await cookies();
+    cookieStore.set(COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: SESSION_DURATION / 1000, // Convert to seconds
+        path: '/',
+    });
+
+    return session;
+}
+
+/**
+ * Get session from cookie
+ */
+export async function getSession(): Promise<Session | null> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
+
+    if (!token) {
+        return null;
     }
 
-    return true;
-  } catch (error) {
-    console.error('Session validation error:', error);
-    return false;
-  }
-}
+    const payload = await verifyToken(token);
 
-export async function login(email: string, password: string): Promise<Session> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Login failed');
-  }
-
-  const data: Session = await response.json();
-
-  setAuthToken(data.token, data.expiresAt - Date.now());
-  setUser(data.user);
-
-  return data;
-}
-
-export async function logout(): Promise<void> {
-  const token = getAuthToken();
-
-  if (token) {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
+    if (!payload) {
+        return null;
     }
-  }
 
-  clearAuthData();
+    // Check if session is expired
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+        await destroySession();
+        return null;
+    }
+
+    return {
+        userId: payload.userId,
+        email: payload.email,
+        role: payload.role,
+        expiresAt: payload.exp ? payload.exp * 1000 : Date.now() + SESSION_DURATION,
+    };
 }
 
-export function getAuthHeader(): Record<string, string> {
-  const token = getAuthToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+/**
+ * Destroy session and clear cookie
+ */
+export async function destroySession(): Promise<void> {
+    const cookieStore = await cookies();
+    cookieStore.delete(COOKIE_NAME);
+}
+
+/**
+ * Refresh session (extend expiration)
+ */
+export async function refreshSession(): Promise<Session | null> {
+    const session = await getSession();
+
+    if (!session) {
+        return null;
+    }
+
+    return createSession(session.userId, session.email, session.role);
+}
+
+/**
+ * Verify if user is authenticated
+ */
+export async function isAuthenticated(): Promise<boolean> {
+    const session = await getSession();
+    return session !== null;
 }

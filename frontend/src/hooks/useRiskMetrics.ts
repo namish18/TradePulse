@@ -1,57 +1,37 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { RiskMetrics } from '@/types/risk';
+import { useQuery } from '@apollo/client';
+import type { RiskMetric, GreeksData } from '@/types/risk';
 
-export function useRiskMetrics() {
-  const [metrics, setMetrics] = useState<RiskMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+// Placeholders until codegen runs
+// import { GetRiskMetricsDocument, GetGreeksDocument } from '@/types/graphql';
 
-  useEffect(() => {
-    const fetchRiskMetrics = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch('/api/risk/metrics');
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch risk metrics');
+export function useRiskMetrics(portfolioId?: string) {
+    const { data: metricsData, loading: metricsLoading, error: metricsError } = useQuery(
+        {} as any, // Placeholder: GET_RISK_METRICS_QUERY
+        {
+            variables: { portfolioId },
+            skip: !portfolioId,
+            pollInterval: 30000, // Poll every 30 seconds
         }
+    );
 
-        const data = await response.json();
-        setMetrics(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
-      }
+    const { data: greeksData, loading: greeksLoading } = useQuery(
+        {} as any, // Placeholder: GET_GREEKS_QUERY
+        {
+            variables: { portfolioId },
+            skip: !portfolioId,
+            pollInterval: 30000,
+        }
+    );
+
+    const metrics: RiskMetric | null = metricsData?.riskMetrics || null;
+    const greeks: GreeksData | null = greeksData?.greeks || null;
+
+    return {
+        metrics,
+        greeks,
+        loading: metricsLoading || greeksLoading,
+        error: metricsError,
     };
-
-    fetchRiskMetrics();
-
-    const interval = setInterval(fetchRiskMetrics, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const refetch = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/risk/metrics');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch risk metrics');
-      }
-
-      const data = await response.json();
-      setMetrics(data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { metrics, loading, error, refetch };
 }

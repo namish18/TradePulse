@@ -1,136 +1,125 @@
-export function addDays(date: Date, days: number): Date {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
+// Date and time helper functions
+
+/**
+ * Format timestamp to readable date string
+ */
+export function formatDate(timestamp: number, includeTime: boolean = false): string {
+    const date = new Date(timestamp);
+
+    if (includeTime) {
+        return new Intl.DateTimeFormat('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(date);
+    }
+
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    }).format(date);
 }
 
-export function addHours(date: Date, hours: number): Date {
-  const result = new Date(date);
-  result.setHours(result.getHours() + hours);
-  return result;
+/**
+ * Format time only
+ */
+export function formatTime(timestamp: number): string {
+    const date = new Date(timestamp);
+    return new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    }).format(date);
 }
 
-export function addMinutes(date: Date, minutes: number): Date {
-  const result = new Date(date);
-  result.setMinutes(result.getMinutes() + minutes);
-  return result;
+/**
+ * Get relative time (e.g., "2 minutes ago")
+ */
+export function getRelativeTime(timestamp: number): string {
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    if (seconds > 0) return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+    return 'just now';
 }
 
-export function substractDays(date: Date, days: number): Date {
-  return addDays(date, -days);
+/**
+ * Check if timestamp is today
+ */
+export function isToday(timestamp: number): boolean {
+    const date = new Date(timestamp);
+    const today = new Date();
+
+    return (
+        date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
+    );
 }
 
-export function substractHours(date: Date, hours: number): Date {
-  return addHours(date, -hours);
+/**
+ * Check if timestamp is this week
+ */
+export function isThisWeek(timestamp: number): boolean {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    return date >= weekAgo && date <= today;
 }
 
-export function substractMinutes(date: Date, minutes: number): Date {
-  return addMinutes(date, -minutes);
+/**
+ * Get start of day timestamp
+ */
+export function getStartOfDay(timestamp?: number): number {
+    const date = timestamp ? new Date(timestamp) : new Date();
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
 }
 
-export function getDaysDifference(date1: Date, date2: Date): number {
-  const oneDay = 24 * 60 * 60 * 1000;
-  return Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneDay));
+/**
+ * Get end of day timestamp
+ */
+export function getEndOfDay(timestamp?: number): number {
+    const date = timestamp ? new Date(timestamp) : new Date();
+    date.setHours(23, 59, 59, 999);
+    return date.getTime();
 }
 
-export function getHoursDifference(date1: Date, date2: Date): number {
-  const oneHour = 60 * 60 * 1000;
-  return Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneHour));
+/**
+ * Format duration in milliseconds to readable string
+ */
+export function formatDuration(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days}d ${hours % 24}h`;
+    if (hours > 0) return `${hours}h ${minutes % 60}m`;
+    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+    return `${seconds}s`;
 }
 
-export function getMinutesDifference(date1: Date, date2: Date): number {
-  const oneMinute = 60 * 1000;
-  return Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneMinute));
-}
+/**
+ * Get timezone offset string
+ */
+export function getTimezoneOffset(): string {
+    const offset = new Date().getTimezoneOffset();
+    const hours = Math.abs(Math.floor(offset / 60));
+    const minutes = Math.abs(offset % 60);
+    const sign = offset <= 0 ? '+' : '-';
 
-export function isToday(date: Date): boolean {
-  const today = new Date();
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  );
-}
-
-export function isYesterday(date: Date): boolean {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return (
-    date.getDate() === yesterday.getDate() &&
-    date.getMonth() === yesterday.getMonth() &&
-    date.getFullYear() === yesterday.getFullYear()
-  );
-}
-
-export function isThisWeek(date: Date): boolean {
-  const today = new Date();
-  const firstDay = new Date(today);
-  firstDay.setDate(today.getDate() - today.getDay());
-
-  const lastDay = new Date(firstDay);
-  lastDay.setDate(lastDay.getDate() + 6);
-
-  return date >= firstDay && date <= lastDay;
-}
-
-export function isThisMonth(date: Date): boolean {
-  const today = new Date();
-  return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-}
-
-export function isThisYear(date: Date): boolean {
-  const today = new Date();
-  return date.getFullYear() === today.getFullYear();
-}
-
-export function getRelativeTime(date: Date | string): string {
-  const d = new Date(date);
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-
-  return d.toLocaleDateString();
-}
-
-export function getStartOfDay(date: Date): Date {
-  const result = new Date(date);
-  result.setHours(0, 0, 0, 0);
-  return result;
-}
-
-export function getEndOfDay(date: Date): Date {
-  const result = new Date(date);
-  result.setHours(23, 59, 59, 999);
-  return result;
-}
-
-export function getStartOfWeek(date: Date): Date {
-  const result = new Date(date);
-  const day = result.getDay();
-  const diff = result.getDate() - day;
-  result.setDate(diff);
-  result.setHours(0, 0, 0, 0);
-  return result;
-}
-
-export function getStartOfMonth(date: Date): Date {
-  const result = new Date(date);
-  result.setDate(1);
-  result.setHours(0, 0, 0, 0);
-  return result;
-}
-
-export function getStartOfYear(date: Date): Date {
-  const result = new Date(date);
-  result.setMonth(0, 1);
-  result.setHours(0, 0, 0, 0);
-  return result;
+    return `UTC${sign}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }

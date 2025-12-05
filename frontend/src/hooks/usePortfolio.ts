@@ -1,77 +1,78 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQuery, useSubscription } from '@apollo/client';
+import type { Position, PortfolioSummary } from '@/types/risk';
 
-interface Position {
-  id: string;
-  symbol: string;
-  quantity: number;
-  averageCost: number;
-  currentPrice: number;
-  pnl: number;
-  pnlPercent: number;
-  exposure: number;
-}
+// Placeholders until codegen runs
+// import { GetPositionsDocument, PositionsUpdatedDocument } from '@/types/graphql';
 
-interface Portfolio {
-  id: string;
-  totalValue: number;
-  cashBalance: number;
-  usedMargin: number;
-  availableMargin: number;
-  positions: Position[];
-  updatedAt: string;
-}
+export function usePortfolio(portfolioId?: string) {
+    const [positions, setPositions] = useState<Position[]>([]);
+    const [summary, setSummary] = useState<PortfolioSummary | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
-export function usePortfolio() {
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch('/api/portfolio');
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch portfolio');
+    // Query initial positions
+    const { data: queryData, loading: queryLoading, error: queryError } = useQuery(
+        {} as any, // Placeholder: GET_POSITIONS_QUERY
+        {
+            variables: { portfolioId },
+            skip: !portfolioId,
         }
+    );
 
-        const data = await response.json();
-        setPortfolio(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
-      }
+    // Subscribe to position updates
+    const { data: subscriptionData } = useSubscription(
+        {} as any, // Placeholder: POSITIONS_UPDATED_SUBSCRIPTION
+        {
+            variables: { portfolioId },
+            skip: !portfolioId,
+        }
+    );
+
+    useEffect(() => {
+        if (queryData?.positions) {
+            setPositions(queryData.positions);
+            setLoading(false);
+        }
+    }, [queryData]);
+
+    useEffect(() => {
+        if (subscriptionData?.positionsUpdated) {
+            setPositions(subscriptionData.positionsUpdated);
+        }
+    }, [subscriptionData]);
+
+    useEffect(() => {
+        if (queryError) {
+            setError(queryError);
+            setLoading(false);
+        }
+    }, [queryError]);
+
+    // Calculate summary from positions
+    useEffect(() => {
+        if (positions.length > 0) {
+            const totalValue = positions.reduce((sum, pos) => sum + pos.currentPrice * pos.quantity, 0);
+            const dailyPnL = positions.reduce((sum, pos) => sum + pos.pnl, 0);
+            const dailyPnLPercent = totalValue > 0 ? (dailyPnL / totalValue) * 100 : 0;
+
+            setSummary({
+                totalValue,
+                dailyPnL,
+                dailyPnLPercent,
+                openPositions: positions.length,
+                winRate: 0, // Would come from trade history
+                totalTrades: 0, // Would come from trade history
+            });
+        }
+    }, [positions]);
+
+    return {
+        positions,
+        summary,
+        loading: queryLoading || loading,
+        error,
     };
-
-    fetchPortfolio();
-
-    const interval = setInterval(fetchPortfolio, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const refetch = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/portfolio');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch portfolio');
-      }
-
-      const data = await response.json();
-      setPortfolio(data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { portfolio, loading, error, refetch };
 }

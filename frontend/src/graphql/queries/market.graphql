@@ -1,24 +1,27 @@
+# GraphQL Queries - Market Data
+
 query GetMarketData($symbols: [String!]!) {
   marketData(symbols: $symbols) {
-    symbol
-    price
-    change
-    changePercent
-    high
-    low
-    volume
-    timestamp
+    ...PriceFields
   }
 }
 
-query GetTickers($limit: Int, $offset: Int) {
-  tickers(limit: $limit, offset: $offset) {
+query GetMarketIndices {
+  marketIndices {
+    name
+    value
+    change
+    changePercent
+  }
+}
+
+query GetTopMovers($limit: Int) {
+  topMovers(limit: $limit) {
     symbol
+    name
     price
-    bidPrice
-    askPrice
-    volume24h
-    change24h
+    changePercent
+    volume
   }
 }
 
@@ -28,28 +31,19 @@ query GetOrderBook($symbol: String!) {
     bids {
       price
       quantity
+      total
     }
     asks {
       price
       quantity
+      total
     }
     timestamp
   }
 }
 
-query GetTrades($symbol: String!, $limit: Int) {
-  trades(symbol: $symbol, limit: $limit) {
-    id
-    symbol
-    price
-    quantity
-    timestamp
-    side
-  }
-}
-
-query GetCandlesticks($symbol: String!, $interval: String!, $limit: Int) {
-  candlesticks(symbol: $symbol, interval: $interval, limit: $limit) {
+query GetChartData($symbol: String!, $timeframe: String!, $limit: Int) {
+  chartData(symbol: $symbol, timeframe: $timeframe, limit: $limit) {
     timestamp
     open
     high

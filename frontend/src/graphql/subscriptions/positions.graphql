@@ -1,46 +1,17 @@
-subscription OnPortfolioUpdated {
-  portfolioUpdated {
-    id
+# GraphQL Subscriptions - Positions
+
+subscription PositionsUpdated($portfolioId: ID!) {
+  positionsUpdated(portfolioId: $portfolioId) {
+    ...PositionFields
+  }
+}
+
+subscription PortfolioUpdated($userId: ID!) {
+  portfolioUpdated(userId: $userId) {
     totalValue
-    cashBalance
-    positions {
-      id
-      symbol
-      quantity
-      currentPrice
-      pnl
-      pnlPercent
-      exposure
-    }
-    timestamp
-  }
-}
-
-subscription OnPositionUpdated($symbolFilter: [String!]) {
-  positionUpdated(symbolFilter: $symbolFilter) {
-    id
-    symbol
-    quantity
-    averageCost
-    currentPrice
-    pnl
-    pnlPercent
-    exposure
-    timestamp
-  }
-}
-
-subscription OnOrderUpdated {
-  orderUpdated {
-    id
-    symbol
-    type
-    side
-    quantity
-    price
-    status
-    filledQuantity
-    averageFillPrice
-    timestamp
+    dailyPnL
+    dailyPnLPercent
+    openPositions
+    winRate
   }
 }

@@ -1,26 +1,13 @@
+# GraphQL Fragment - Position Fields
+
 fragment PositionFields on Position {
   id
   symbol
   quantity
-  averageCost
+  entryPrice
   currentPrice
   pnl
   pnlPercent
-  exposure
-  createdAt
-  updatedAt
-}
-
-fragment OrderFields on Order {
-  id
-  symbol
-  type
   side
-  quantity
-  price
-  status
-  filledQuantity
-  averageFillPrice
-  createdAt
-  updatedAt
+  openedAt
 }

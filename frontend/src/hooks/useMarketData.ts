@@ -1,47 +1,45 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { MarketData } from '@/types/market';
+import { useEffect, useState } from 'use';
+import { useSubscription } from '@apollo/client';
+import type { MarketTick } from '@/types/market';
 
-interface UseMarketDataOptions {
-  symbols: string[];
-  refreshInterval?: number;
-}
+// This would be imported from generated types after codegen
+// import { MarketDataUpdatedDocument } from '@/types/graphql';
 
-export function useMarketData({ symbols, refreshInterval = 5000 }: UseMarketDataOptions) {
-  const [data, setData] = useState<MarketData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+export function useMarketData(symbols: string[]) {
+    const [data, setData] = useState<MarketTick[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchMarketData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // This will be replaced with Apollo Client query
-        const response = await fetch(
-          `/api/market?symbols=${symbols.join(',')}`
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch market data');
+    // Note: This is using a placeholder query name
+    // After running codegen, import the actual subscription document
+    const { data: subscriptionData, loading: subLoading, error: subError } = useSubscription(
+        // MARKET_DATA_UPDATED_SUBSCRIPTION,
+        {} as any, // Placeholder until codegen runs
+        {
+            variables: { symbols },
+            skip: symbols.length === 0,
         }
+    );
 
-        const marketData = await response.json();
-        setData(marketData);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
-      }
+    useEffect(() => {
+        if (subscriptionData?.marketDataUpdated) {
+            setData(subscriptionData.marketDataUpdated);
+            setLoading(false);
+        }
+    }, [subscriptionData]);
+
+    useEffect(() => {
+        if (subError) {
+            setError(subError);
+            setLoading(false);
+        }
+    }, [subError]);
+
+    return {
+        data,
+        loading: subLoading || loading,
+        error,
     };
-
-    fetchMarketData();
-
-    const interval = setInterval(fetchMarketData, refreshInterval);
-    return () => clearInterval(interval);
-  }, [symbols, refreshInterval]);
-
-  return { data, loading, error };
 }

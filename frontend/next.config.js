@@ -1,42 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  
+  // Enable experimental features
   experimental: {
     serverActions: {
-      allowedOrigins: ['*'],
+      bodySizeLimit: '2mb',
     },
   },
-  images: {
-    formats: ['image/avif', 'image/webp'],
+  
+  // Webpack configuration for .graphql file imports
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(graphql|gql)$/,
+      exclude: /node_modules/,
+      loader: 'graphql-tag/loader',
+    });
+    return config;
   },
-  headers: async () => {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-        ],
-      },
-    ];
+  
+  // Environment variables available to the browser
+  env: {
+    NEXT_PUBLIC_GRAPHQL_HTTP_URL: process.env.NEXT_PUBLIC_GRAPHQL_HTTP_URL,
+    NEXT_PUBLIC_GRAPHQL_WS_URL: process.env.NEXT_PUBLIC_GRAPHQL_WS_URL,
+    NEXT_PUBLIC_ENABLE_PERSISTED_QUERIES: process.env.NEXT_PUBLIC_ENABLE_PERSISTED_QUERIES,
   },
 };
 

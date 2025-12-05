@@ -1,19 +1,12 @@
-fragment PriceFields on MarketData {
+# GraphQL Fragment - Price Fields
+
+fragment PriceFields on MarketTick {
   symbol
   price
   change
   changePercent
-  high
-  low
   volume
+  high24h
+  low24h
   timestamp
-}
-
-fragment TickerFields on Ticker {
-  symbol
-  price
-  bidPrice
-  askPrice
-  volume24h
-  change24h
 }
