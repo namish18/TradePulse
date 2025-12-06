@@ -1,0 +1,71 @@
+"""
+Market Data Types
+Real-time market data, ticks, order books, and OHLCV
+"""
+
+type MarketTick implements Node {
+  id: ID!
+  symbol: String!
+  price: Float!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: BigInt!
+  change: Float!
+  changePercent: Float!
+  timestamp: DateTime!
+}
+
+type OrderBook {
+  symbol: String!
+  bids: [OrderBookLevel!]!
+  asks: [OrderBookLevel!]!
+  lastUpdated: DateTime!
+}
+
+type OrderBookLevel {
+  price: Float!
+  quantity: Float!
+  total: Float!
+}
+
+type MarketIndex {
+  symbol: String!
+  name: String!
+  value: Float!
+  change: Float!
+  changePercent: Float!
+  timestamp: DateTime!
+}
+
+type OHLCV {
+  symbol: String!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: BigInt!
+  timestamp: DateTime!
+}
+
+input MarketDataFilter {
+  symbols: [String!]
+  startTime: DateTime
+  endTime: DateTime
+  interval: String
+}
+
+extend type Query {
+  marketTick(symbol: String!): MarketTick
+  marketTicks(symbols: [String!]!): [MarketTick!]!
+  orderBook(symbol: String!, depth: Int): OrderBook
+  marketIndices: [MarketIndex!]!
+  ohlcv(symbol: String!, interval: String!, limit: Int): [OHLCV!]!
+  topMovers(limit: Int, direction: String): [MarketTick!]!
+}
+
+extend type Subscription {
+  marketTickUpdated(symbols: [String!]!): MarketTick!
+  orderBookUpdated(symbol: String!): OrderBook!
+}

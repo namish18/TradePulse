@@ -1,0 +1,106 @@
+"""
+Risk Analytics Types
+Risk metrics, Greeks, exposure, and alerts
+"""
+
+type RiskMetrics {
+  portfolioId: ID!
+  var95: Float!
+  var99: Float!
+  cvar95: Float!
+  cvar99: Float!
+  sharpeRatio: Float!
+  sortinoRatio: Float!
+  maxDrawdown: Float!
+  beta: Float!
+  alpha: Float!
+  volatility: Float!
+  timestamp: DateTime!
+}
+
+type GreeksData {
+  positionId: ID!
+  symbol: String!
+  delta: Float!
+  gamma: Float!
+  theta: Float!
+  vega: Float!
+  rho: Float!
+  timestamp: DateTime!
+}
+
+type ExposureBreakdown {
+  portfolioId: ID!
+  bySector: [SectorExposure!]!
+  byAssetClass: [AssetClassExposure!]!
+  byGeography: [GeographyExposure!]!
+  timestamp: DateTime!
+}
+
+type SectorExposure {
+  sector: String!
+  value: Float!
+  weight: Float!
+  pnl: Float!
+}
+
+type AssetClassExposure {
+  assetClass: String!
+  value: Float!
+  weight: Float!
+}
+
+type GeographyExposure {
+  region: String!
+  value: Float!
+  weight: Float!
+}
+
+type StressScenario {
+  id: ID!
+  name: String!
+  description: String
+  impactValue: Float!
+  impactPercent: Float!
+  assumptions: JSON
+}
+
+type Alert implements Node {
+  id: ID!
+  userId: ID!
+  portfolioId: ID
+  type: String!
+  severity: String!
+  title: String!
+  message: String!
+  metadata: JSON
+  isRead: Boolean!
+  createdAt: DateTime!
+}
+
+input AlertFilter {
+  type: String
+  severity: String
+  isRead: Boolean
+  portfolioId: ID
+}
+
+extend type Query {
+  riskMetrics(portfolioId: ID!): RiskMetrics @requireAuth
+  greeks(portfolioId: ID!): [GreeksData!]! @requireAuth
+  exposure(portfolioId: ID!): ExposureBreakdown @requireAuth
+  stressScenarios(portfolioId: ID!): [StressScenario!]! @requireAuth
+  alerts(filter: AlertFilter, limit: Int, offset: Int): [Alert!]! @requireAuth
+  alert(id: ID!): Alert @requireAuth
+}
+
+extend type Mutation {
+  markAlertRead(id: ID!): Alert! @requireAuth
+  markAllAlertsRead: Boolean! @requireAuth
+  deleteAlert(id: ID!): Boolean! @requireAuth
+}
+
+extend type Subscription {
+  riskMetricsUpdated(portfolioId: ID!): RiskMetrics!
+  alertTriggered(userId: ID!): Alert!
+}

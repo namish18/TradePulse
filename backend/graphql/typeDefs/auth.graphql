@@ -1,0 +1,42 @@
+"""
+Authentication and User Types
+"""
+
+type User implements Node {
+  id: ID!
+  email: String!
+  name: String!
+  role: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  portfolios: [Portfolio!]!
+}
+
+type AuthPayload {
+  token: String!
+  refreshToken: String!
+  user: User!
+  expiresAt: DateTime!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  name: String!
+}
+
+extend type Query {
+  me: User @requireAuth
+}
+
+extend type Mutation {
+  login(input: LoginInput!): AuthPayload!
+  register(input: RegisterInput!): AuthPayload!
+  refreshToken(refreshToken: String!): AuthPayload!
+  logout: Boolean! @requireAuth
+}

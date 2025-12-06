@@ -1,0 +1,33 @@
+"""
+Common Types and Directives
+Shared scalars, directives, and interfaces
+"""
+
+# Custom Scalars
+scalar DateTime
+scalar JSON
+scalar BigInt
+
+# Pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# Error Type
+type Error {
+  code: String!
+  message: String!
+  field: String
+}
+
+# Node Interface
+interface Node {
+  id: ID!
+}
+
+# Custom Directives
+directive @requireAuth(role: String) on FIELD_DEFINITION
+directive @ratelimit(limit: Int!, duration: Int!) on FIELD_DEFINITION

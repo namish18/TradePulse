@@ -1,0 +1,91 @@
+"""
+Portfolio and Position Types
+Portfolio management, positions, and trades
+"""
+
+type Portfolio implements Node {
+  id: ID!
+  userId: ID!
+  name: String!
+  description: String
+  totalValue: Float!
+  totalPnL: Float!
+  totalPnLPercent: Float!
+  dayPnL: Float!
+  dayPnLPercent: Float!
+  positions: [Position!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Position implements Node {
+  id: ID!
+  portfolioId: ID!
+  symbol: String!
+  quantity: Float!
+  avgEntryPrice: Float!
+  currentPrice: Float!
+  marketValue: Float!
+  costBasis: Float!
+  unrealizedPnL: Float!
+  unrealizedPnLPercent: Float!
+  realizedPnL: Float!
+  dayPnL: Float!
+  dayPnLPercent: Float!
+  weight: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Trade implements Node {
+  id: ID!
+  portfolioId: ID!
+  positionId: ID
+  symbol: String!
+  side: String!
+  quantity: Float!
+  price: Float!
+  total: Float!
+  fees: Float!
+  executedAt: DateTime!
+  status: String!
+}
+
+type PortfolioConnection {
+  edges: [PortfolioEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type PortfolioEdge {
+  node: Portfolio!
+  cursor: String!
+}
+
+input CreatePortfolioInput {
+  name: String!
+  description: String
+}
+
+input UpdatePortfolioInput {
+  name: String
+  description: String
+}
+
+extend type Query {
+  portfolio(id: ID!): Portfolio @requireAuth
+  portfolios(first: Int, after: String): PortfolioConnection! @requireAuth
+  position(id: ID!): Position @requireAuth
+  trades(portfolioId: ID!, limit: Int, offset: Int): [Trade!]! @requireAuth
+}
+
+extend type Mutation {
+  createPortfolio(input: CreatePortfolioInput!): Portfolio! @requireAuth
+  updatePortfolio(id: ID!, input: UpdatePortfolioInput!): Portfolio! @requireAuth
+  deletePortfolio(id: ID!): Boolean! @requireAuth
+}
+
+extend type Subscription {
+  positionUpdated(portfolioId: ID!): Position!
+  portfolioUpdated(portfolioId: ID!): Portfolio!
+}
